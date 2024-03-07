@@ -13,7 +13,7 @@ spec:
     type: string
   workspaces:
   - name: shared-data
-  - name: dockerconfig
+  - name: docker-credentials
   tasks:
   - name: fetch-source
     taskRef:
@@ -31,6 +31,8 @@ spec:
     workspaces:
     - name: source
       workspace: shared-data
+    - name: dockerconfig
+      workspace: docker-credentials
     params:
     - name: IMAGE
       value: $(params.image-reference)
@@ -55,7 +57,7 @@ spec:
         resources:
           requests:
             storage: 1Gi
-  - name: dockerconfig
+  - name: docker-credentials
     secret:
       secretName: docker-credentials
   params:
