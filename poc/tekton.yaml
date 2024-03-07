@@ -16,7 +16,7 @@ spec:
     type: string
   workspaces:
   - name: shared-data
-  - name: docker-credentials
+  - name: dockerconfig
   tasks:
   - name: fetch-source
     taskRef:
@@ -27,8 +27,6 @@ spec:
     params:
     - name: url
       value: $(params.repo-url)
-    - name: revision
-      value: $(params.revision)
   - name: build-push
     runAfter: ["fetch-source"]
     taskRef:
@@ -37,7 +35,7 @@ spec:
     - name: source
       workspace: shared-data
     - name: dockerconfig
-      workspace: docker-credentials
+      workspace: dockerconfig
     params:
     - name: IMAGE
       value: $(params.image-reference)
@@ -62,14 +60,12 @@ spec:
         resources:
           requests:
             storage: 1Gi
-  - name: docker-credentials
+  - name: dockerconfig
     secret:
       secretName: docker-credentials
   params:
   - name: repo-url
     value: https://github.com/Prakash1810/tekton-code-repo.git
-  - name: revision
-    value: main
   - name: image-reference
     value: 181098/tekton-demo:v1
 ---
