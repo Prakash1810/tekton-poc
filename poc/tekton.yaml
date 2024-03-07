@@ -36,7 +36,7 @@ spec:
     workspaces:
     - name: source
       workspace: shared-data
-    - name: dockerconfig
+    - name: docker-credentials
       workspace: docker-credentials
     params:
     - name: IMAGE
