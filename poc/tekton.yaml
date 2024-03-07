@@ -1,21 +1,75 @@
 apiVersion: tekton.dev/v1beta1
-kind: Task
+kind: Pipeline
 metadata:
-  name: hello
+  name: clone-build-push
 spec:
-  steps:
-    - name: echo
-      image: alpine
-      script: |
-        #!/bin/sh
-        echo "Hello World"   
+  description: |
+    This pipeline clones a git repo, builds a Docker image with Kaniko and
+    pushes it to a registry    
+  params:
+  - name: repo-url
+    type: string
+  - name: image-reference
+    type: string
+  workspaces:
+  - name: shared-data
+  - name: docker-credentials
+  tasks:
+  - name: fetch-source
+    taskRef:
+      name: git-clone
+    workspaces:
+    - name: output
+      workspace: shared-data
+    params:
+    - name: url
+      value: $(params.repo-url)
+  - name: build-push
+    runAfter: ["fetch-source"]
+    taskRef:
+      name: kaniko
+    workspaces:
+    - name: source
+      workspace: shared-data
+    - name: dockerconfig
+      workspace: docker-credentials
+    params:
+    - name: IMAGE
+      value: $(params.image-reference)
 ---
 
 apiVersion: tekton.dev/v1beta1
-kind: TaskRun
+kind: PipelineRun
 metadata:
-  name: hello-task-run
+  generateName: clone-build-push-run-
 spec:
-  taskRef:
-    name: hello
+  pipelineRef:
+    name: clone-build-push
+  podTemplate:
+    securityContext:
+      fsGroup: 65532
+  workspaces:
+  - name: shared-data
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+  - name: docker-credentials
+    secret:
+      secretName: docker-credentials
+  params:
+  - name: repo-url
+    value: https://github.com/Prakash1810/tekton-code-repo.git
+  - name: image-reference
+    value: 181098/tekton-demo:v1
 ---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: docker-credentials
+data:
+  config.json: ewogICAgICAgICJhdXRocyI6IHsKICAgICAgICAgICAgICAgICJodHRwczovL2luZGV4LmRvY2tlci5pby92MS8iOiB7CiAgICAgICAgICAgICAgICAgICAgICAgICJhdXRoIjogIk1UZ3hNRGs0T2xKaGJXRmphR0Z1WkhKaGJrQXhPREV3IgogICAgICAgICAgICAgICAgfQogICAgICAgIH0KfQ==
