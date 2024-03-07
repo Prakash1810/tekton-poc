@@ -11,6 +11,9 @@ spec:
     type: string
   - name: image-reference
     type: string
+  - name: revision
+    description: Revision to checkout. (branch, tag, sha, ref, etc...)
+    type: string
   workspaces:
   - name: shared-data
   - name: docker-credentials
@@ -24,6 +27,8 @@ spec:
     params:
     - name: url
       value: $(params.repo-url)
+    - name: revision
+      value: $(params.revision)
   - name: build-push
     runAfter: ["fetch-source"]
     taskRef:
@@ -63,6 +68,8 @@ spec:
   params:
   - name: repo-url
     value: https://github.com/Prakash1810/tekton-code-repo.git
+  - name: revision
+    value: main
   - name: image-reference
     value: 181098/tekton-demo:v1
 ---
