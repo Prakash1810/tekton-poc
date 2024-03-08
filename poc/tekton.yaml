@@ -24,18 +24,16 @@ spec:
     params:
     - name: url
       value: $(params.repo-url)
-  - name: build-push
-    runAfter: ["fetch-source"]
+  - name: build
     taskRef:
-      name: kaniko
-    workspaces:
-    - name: source
-      workspace: shared-data
-    - name: dockerconfig
-      workspace: docker-credentials
+      name: buildah
+    runAfter:
+      - fetch-source
     params:
-    - name: IMAGE
-      value: $(params.image-reference)
+      - name: IMAGE
+        value: $(params.image-reference)
+      - name: IMAGE_PUSH_SECRET_NAME
+        value: image-push-secrets
 ---
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
@@ -64,11 +62,4 @@ spec:
     value: https://github.com/Prakash1810/tekton-code-repo.git
   - name: image-reference
     value: 181098/tekton-demo:v1
----
 
-apiVersion: v1
-kind: Secret
-metadata:
-  name: docker-credentials
-data:
-  config.json: ewoJImF1dGhzIjogewoJCSJodHRwczovL2luZGV4LmRvY2tlci5pby92MS8iOiB7CgkJCSJhdXRoIjogIk1UZ3hNRGs0T2xKaGJXRmphR0Z1WkhKaGJrQXhPREV3IgoJCX0KCX0KfQ==
