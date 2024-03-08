@@ -13,7 +13,6 @@ spec:
     type: string
   workspaces:
   - name: shared-data
-  - name: docker-credentials
   tasks:
   - name: fetch-source
     taskRef:
@@ -54,9 +53,6 @@ spec:
         resources:
           requests:
             storage: 1Gi
-  - name: docker-credentials
-    secret:
-      secretName: docker-credentials
   params:
   - name: repo-url
     value: https://github.com/Prakash1810/tekton-code-repo.git
