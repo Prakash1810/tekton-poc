@@ -33,6 +33,9 @@ spec:
         value: $(params.image-reference)
       - name: IMAGE_PUSH_SECRET_NAME
         value: image-push-secrets
+    workspaces:
+      - name: source
+        workspace: shared-data
 ---
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
